@@ -1,0 +1,5 @@
+*.os
+
+/libwebsocket-notifier.so
+
+/.sconsign.dblite
