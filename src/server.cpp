@@ -2,6 +2,8 @@
 
 #include <zeppelin/logger.h>
 
+#include <jsoncpp/json/writer.h>
+
 // =====================================================================================================================
 std::shared_ptr<Server> Server::create(const std::shared_ptr<zeppelin::player::Controller>& ctrl)
 {
@@ -47,43 +49,69 @@ void Server::stop()
 // =====================================================================================================================
 void Server::started()
 {
-    broadcast("started");
+    Json::Value resp(Json::objectValue);
+    resp["event"] = "started";
+
+    broadcast(resp);
 }
 
 // =====================================================================================================================
 void Server::paused()
 {
-    broadcast("paused");
+    Json::Value resp(Json::objectValue);
+    resp["event"] = "paused";
+
+    broadcast(resp);
 }
 
 // =====================================================================================================================
 void Server::stopped()
 {
-    broadcast("stopped");
+    Json::Value resp(Json::objectValue);
+    resp["event"] = "stopped";
+
+    broadcast(resp);
 }
 
 // =====================================================================================================================
-void Server::positionChanged()
+void Server::positionChanged(unsigned pos)
 {
-    broadcast("position-changed");
+    Json::Value resp(Json::objectValue);
+    resp["event"] = "position-changed";
+    resp["position"] = pos;
+
+    broadcast(resp);
 }
 
 // =====================================================================================================================
-void Server::songChanged()
+void Server::songChanged(const std::vector<int>& idx)
 {
-    broadcast("song-changed");
+    Json::Value resp(Json::objectValue);
+    resp["event"] = "song-changed";
+    resp["index"] = Json::Value(Json::arrayValue);
+    for (int i : idx)
+	resp["index"].append(i);
+
+    broadcast(resp);
 }
 
 // =====================================================================================================================
 void Server::queueChanged()
 {
-    broadcast("queue-changed");
+    Json::Value resp(Json::objectValue);
+    resp["event"] = "queue-changed";
+
+    broadcast(resp);
 }
 
 // =====================================================================================================================
-void Server::volumeChanged()
+void Server::volumeChanged(int level)
 {
-    broadcast("volume-changed");
+    Json::Value resp(Json::objectValue);
+    resp["event"] = "volume-changed";
+    resp["level"] = level;
+
+    broadcast(resp);
 }
 
 // =====================================================================================================================
@@ -124,10 +152,12 @@ void Server::onClose(websocketpp::connection_hdl hdl)
 }
 
 // =====================================================================================================================
-void Server::broadcast(const std::string& data)
+void Server::broadcast(const Json::Value& data)
 {
+    std::string s = Json::FastWriter().write(data);
+
     websocketpp::lib::unique_lock<websocketpp::lib::mutex> lock(m_mutex);
 
     for (const auto& hdl : m_connections)
-	m_websocketServer.send(hdl, data, websocketpp::frame::opcode::text);
+	m_websocketServer.send(hdl, s, websocketpp::frame::opcode::text);
 }

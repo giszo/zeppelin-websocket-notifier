@@ -26,10 +26,10 @@ class Server : public zeppelin::plugin::Plugin,
 	void started() override;
 	void paused() override;
 	void stopped() override;
-	void positionChanged() override;
-	void songChanged() override;
+	void positionChanged(unsigned pos) override;
+	void songChanged(const std::vector<int>& idx) override;
 	void queueChanged() override;
-	void volumeChanged() override;
+	void volumeChanged(int level) override;
 
     private:
 	Server(const std::shared_ptr<zeppelin::player::Controller>& ctrl);
@@ -39,7 +39,7 @@ class Server : public zeppelin::plugin::Plugin,
 	void onOpen(websocketpp::connection_hdl hdl);
 	void onClose(websocketpp::connection_hdl hdl);
 
-	void broadcast(const std::string& data);
+	void broadcast(const Json::Value& data);
 
     private:
 	std::shared_ptr<zeppelin::player::Controller> m_ctrl;
