@@ -11,6 +11,9 @@ env["CPPFLAGS"] = ["-O2", "-Wall", "-Werror", "-Wshadow", "-std=c++11", "-pthrea
 env["CPPPATH"] = [Dir("src")]
 env["CPPDEFINES"] = ["_WEBSOCKETPP_CPP11_STL_"]
 
+env["SHCXXCOMSTR"] = "Compiling $SOURCE"
+env["SHLINKCOMSTR"] = "Linking $TARGET"
+
 if "PREFIX" in env :
     env["CPPPATH"] += ["%s/include" % env["PREFIX"]]
 
