@@ -17,6 +17,7 @@ Server::Server(const std::shared_ptr<zeppelin::player::Controller>& ctrl)
     : m_ctrl(ctrl)
 {
     m_websocketServer.init_asio();
+    m_websocketServer.set_reuse_addr(true);
     m_websocketServer.set_open_handler(websocketpp::lib::bind(&Server::onOpen, this, websocketpp::lib::placeholders::_1));
     m_websocketServer.set_close_handler(websocketpp::lib::bind(&Server::onClose, this, websocketpp::lib::placeholders::_1));
 }
